@@ -214,7 +214,8 @@ def calc_gost94(msg):
         res += "{:02x}".format(i)
     return res	
 	
-
+	
+	
 def main():
     print "GOST R 34.11-94"
     data = ""

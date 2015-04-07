@@ -1,4 +1,4 @@
-﻿#coding: UTF-8
+﻿﻿#coding: UTF-8
 import subprocess
 import pytest
 import gost94
@@ -12,27 +12,28 @@ def run_cmd(cmd, input=None):
 
     return pr.communicate(input=input)
 
-def get_text_digest(text):
+
+def hash_gost94(fn):
     '''
     Получение текстового представления хэш-кода переданного текста
     по ГОСТ Р 34.11-94.
-    @param  text    Текст, хэш-код которого необходимо получить.
-    @return Закодированный в base64 хэш-код текста.
+    text    текст, хэш-код которого необходимо получить
+    return  хэш-код
     '''
-    openssl_sign_cmd = ['openssl', 'dgst', '-binary', '-md_gost94']
+    cmd_line = ['rhash', '--gost', fn]
 
-    out, err = run_cmd(openssl_sign_cmd, input=text)
+    out, err = run_cmd(cmd_line, input=None)
     if err:
-        raise ValueError('OpenSSL error: %s' % err)
+        raise ValueError('Rhash error: %s' % err)
+    # Удаляем наименование файла за хешем (..hash..  test)
+    out = out[:-7]
+    return out	
 
-    return out
 
-
-def test_ripemd160():
-    data = 'GOST R 34.11-94'
-    assert hash_gost94(data) == gost94.calc_gost94(data)
+def test_gost94():
+    fn = 'test'
+    data = gost94.readFile(fn)
+    assert hash_gost94(fn) == gost94.calc_gost94(data)
 	
 #if __name__ == '__main__':
-    #test_ripemd160()
-   #data = 'GOST R 34.11-94'
-   # print get_text_digest(data)
+   # test_gost94()

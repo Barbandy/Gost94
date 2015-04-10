@@ -13,27 +13,20 @@ def run_cmd(cmd, input=None):
     return pr.communicate(input=input)
 
 
-def hash_gost94(fn):
-    '''
-    Получение хэш-кода из исходного файла
-    по ГОСТ Р 34.11-94.
-    fn   файл с текстом, хэш-код которого необходимо получить
-    return  хэш-код
-    '''
-    cmd_line = ['rhash', '--gost', fn]
-
-    out, err = run_cmd(cmd_line, input=None)
+def hash_gost94(text):
+    cmd_line= ['openssl', 'dgst', '-hex', '-md_gost94']
+    out, err = run_cmd(cmd_line, input=text)
     if err:
-        raise ValueError('Rhash error: %s' % err)
-    # Удаляем наименование файла за хешем (..hash..  test)
-    out = out[:-7]
+        raise ValueError('OpenSSL error: %s' % err)
+    # (stdin)= hash /n
+    out = out[9:-1]
     return out	
 
 
 def test_gost94():
-    fn = 'test'
-    data = gost94.readFile(fn)
-    assert hash_gost94(fn) == gost94.calc_gost94(data)
+    data = 'test'
+    assert  hash_gost94(data) == gost94.calc_gost94(data)
+    
+
+
 	
-#if __name__ == '__main__':
-   # test_gost94()
